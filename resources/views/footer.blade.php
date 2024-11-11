@@ -216,6 +216,8 @@
 </div>
 
 <!-- Library Bundle Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="{{ asset('js/core/libs.min.js') }}"></script>
 
 <!-- External Library Bundle Script -->

@@ -22,6 +22,20 @@
                                 Surat
                             </label>
                         </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="menus[]" value="Dokumen"
+                                    {{ isset($permissions['Dokumen']) && $permissions['Dokumen'] ? 'checked' : '' }}>
+                                Dokumen
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="menus[]" value="Pengajuan"
+                                    {{ isset($permissions['Pengajuan']) && $permissions['Pengajuan'] ? 'checked' : '' }}>
+                                Pengajuan
+                            </label>
+                        </div>
                         <button type="submit" class="btn btn-primary">Save Permissions</button>
                     </form>
                 </div>

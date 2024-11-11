@@ -9,6 +9,7 @@
                         <a href="{{ route('menu.permissions', 'Kepsek') }}" class="btn btn-secondary">Kepsek</a>
                         <a href="{{ route('menu.permissions', 'Kesiswaan') }}" class="btn btn-info">Kesiswaan</a>
                         <a href="{{ route('menu.permissions', 'Guru') }}" class="btn btn-gray">Guru</a>
+                        <a href="{{ route('menu.permissions', 'HRD') }}" class="btn btn-danger">HRD</a>
                     </div>
                 </div>
             </div>

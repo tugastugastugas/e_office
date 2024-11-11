@@ -19,7 +19,7 @@ class UserLevelController extends Controller
     public function showMenuPermissions($userLevel)
     {
 
-        $validLevels = ['Admin', 'Kepsek', 'Kesiswaan', 'Guru'];
+        $validLevels = ['Admin', 'Kepsek', 'Kesiswaan', 'Guru', 'HRD'];
         if (!in_array($userLevel, $validLevels)) {
             abort(404);
         }
@@ -43,7 +43,7 @@ class UserLevelController extends Controller
         $userLevel = $request->input('user_level');
         $selectedMenus = $request->input('menus', []);
 
-        $allMenus = ['Setting', 'Surat']; // Sesuaikan dengan daftar menu Anda
+        $allMenus = ['Setting', 'Surat', 'Dokumen', 'Pengajuan']; // Sesuaikan dengan daftar menu Anda
 
         foreach ($allMenus as $menu) {
             Permission::updateOrCreate(
