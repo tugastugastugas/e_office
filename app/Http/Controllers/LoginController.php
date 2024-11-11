@@ -59,4 +59,45 @@ class LoginController extends Controller
             return back()->withErrors(['loginError' => 'Invalid username or password'])->withInput();
         }
     }
+
+    public function logout()
+    {
+        Session::flush(); // Hapus semua session
+        return redirect()->route('login')->with('success', 'Logout successful');
+    }
+
+    public function register()
+    {
+
+        echo view('register');
+    }
+
+    public function tambah_akun(Request $request)
+    {
+        try {
+            // Validasi inputan
+            $request->validate([
+                'username' => 'required',
+                'password' => 'required',
+                'email' => 'required',
+            ]);
+
+            // Simpan data ke tabel user
+            $user = new User(); // Ubah variabel dari $quiz menjadi $user untuk kejelasan
+            $user->username = $request->input('username');
+            $user->password = md5($request->input('password')); // Enkripsi password
+            $user->email = $request->input('email');
+            $user->level = 'Admin'; // Tetapkan level ke "Murid"
+
+            // Simpan ke database
+            $user->save();
+
+            // Redirect ke halaman lain
+            return redirect()->route('login')->with('success', 'Akun berhasil ditambahkan.'); // Menambahkan flash message untuk feedback
+        } catch (\Exception $e) {
+            Log::error('Gagal mengembalikan data pengguna: ' . $e->getMessage());
+            // Redirect kembali dengan pesan kesalahan
+            return redirect()->back()->withErrors(['msg' => 'Gagal menambahkan akun. Silakan coba lagi.']);
+        }
+    }
 }
