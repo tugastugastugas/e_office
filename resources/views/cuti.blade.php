@@ -41,7 +41,7 @@ $userID =session()->get('id');
                                 <td>
                                     @if($sm->status === 'Pending')
                                     <!-- Tampilkan tombol Setuju jika status masih Pending -->
-                                    @if($userLevel == "Admin")
+                                    @if($userLevel == "Kepsek")
                                     <form action="{{ route('setuju.cuti', $sm->id_cuti) }}" method="POST" style="display:inline;">
                                         @csrf
                                         <button class="btn btn-outline-primary btn-sm" type="submit">Setuju</button>

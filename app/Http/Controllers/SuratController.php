@@ -221,29 +221,48 @@ class SuratController extends BaseController
 
     public function kirimSurat($id)
     {
-        ActivityLog::create([
-            'action' => 'create',
-            'user_id' => Session::get('id'), // ID pengguna yang sedang login
-            'description' => "User  Mengirim Surat dengan id_surat.: $id",
-        ]);
+        try {
+            // Log aktivitas
+            ActivityLog::create([
+                'action' => 'create',
+                'user_id' => Session::get('id'),
+                'description' => "User Mengirim Surat dengan id_surat: $id",
+            ]);
 
-        Log::info("Kirim surat berhasil dipanggil dengan ID: $id");
+            // Ambil detail surat berdasarkan ID
+            $surat = Surat::findOrFail($id);
 
-        // Ambil detail surat berdasarkan ID
-        $surat = Surat::find($id);
-        $emails = User::where('level', $surat->penerima)->pluck('email')->toArray();
+            // Ambil email penerima berdasarkan level
+            $emails = User::where('level', $surat->penerima)
+                ->pluck('email')
+                ->filter() // Hapus email kosong
+                ->toArray();
 
-        // Cek apakah ada penerima
-        if (!empty($emails)) {
+            // Validasi penerima email
+            if (empty($emails)) {
+                Log::error("Tidak ada email untuk penerima: {$surat->penerima}");
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada penerima email'
+                ], 400);
+            }
+
             // Kirim email ke setiap penerima
             foreach ($emails as $email) {
                 Mail::to($email)->send(new SuratKeluarMail($surat));
             }
 
-            return response()->json(['success' => true, 'message' => 'Surat berhasil dikirim']);
-        } else {
-            Log::error("Tidak ada email untuk penerima: {$surat->penerima}");
-            return response()->json(['success' => false, 'message' => 'Tidak ada penerima email']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Surat berhasil dikirim'
+            ]);
+        } catch (\Exception $e) {
+            // Tangani kesalahan
+            Log::error('Gagal mengirim surat: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim surat: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

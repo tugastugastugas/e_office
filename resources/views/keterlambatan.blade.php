@@ -43,7 +43,7 @@ $userID =session()->get('id');
                                 <td>
                                     @if($sm->status === 'Pending')
                                     <!-- Tampilkan tombol Setuju jika status masih Pending -->
-                                    @if($userLevel == "Admin")
+                                    @if($userLevel == "Kepsek")
                                     <form action="{{ route('setuju.keterlambatan', $sm->id_telat) }}" method="POST" style="display:inline;">
                                         @csrf
                                         <button class="btn btn-outline-primary btn-sm" type="submit">Setuju</button>
@@ -51,7 +51,7 @@ $userID =session()->get('id');
                                     @endif
                                     @elseif($sm->status === 'Setuju')
                                     <!-- Tampilkan tombol Konfirmasi jika status sudah Setuju -->
-                                    @if($userLevel == "Admin")
+                                    @if($userLevel == "HRD")
                                     <form action="{{ route('konfirmasi.keterlambatan', $sm->id_telat) }}" method="POST" style="display:inline;">
                                         @csrf
                                         <button class="btn btn-outline-success btn-sm" type="submit">Konfirmasi</button>

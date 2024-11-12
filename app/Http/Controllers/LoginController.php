@@ -87,7 +87,7 @@ class LoginController extends Controller
             $user->username = $request->input('username');
             $user->password = md5($request->input('password')); // Enkripsi password
             $user->email = $request->input('email');
-            $user->level = 'Admin'; // Tetapkan level ke "Murid"
+            $user->level = 'Guru'; // Tetapkan level ke "Murid"
 
             // Simpan ke database
             $user->save();
