@@ -29,6 +29,11 @@
                                 <td>{{ $sk->created_at }}</td>
                                 <td>
                                     <button type="button" class="btn btn-outline-primary kirim-surat" data-id="{{ $sk->id_surat }}" data-action="{{ url('/kirim-surat/'.$sk->id_surat) }}">Kirim Surat</button>
+                                    <a href="{{ route('download.surat', $sk->id_surat) }}"
+                                        class="btn btn-primary btn-sm"
+                                        title="Download Surat">
+                                        Download
+                                    </a>
                                 </td>
                             </tr>
                             @endforeach

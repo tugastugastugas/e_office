@@ -172,4 +172,50 @@ class FolderController extends BaseController
             return redirect()->back()->with('error', 'File tidak ditemukan di server.');
         }
     }
+
+    public function updateAccess(Request $request)
+    {
+        ActivityLog::create([
+            'action' => 'create',
+            'user_id' => Session::get('id'), // ID pengguna yang sedang login
+            'description' => 'User Mengupdate Hak Akses.',
+        ]);
+
+        // Validasi input
+        $request->validate([
+            'folder_id' => 'required|integer|exists:folder,id_folder',
+            'level_access' => 'array',
+            'level_access.*' => 'string|in:Admin,Kesiswaan,Kepsek,Guru,HRD', // Validasi string
+        ]);
+
+        // Ambil folder berdasarkan ID
+        $folder = Folder::find($request->folder_id);
+
+        // Mengubah level akses menjadi string yang dipisahkan koma
+        $folder->level_access = implode(',', $request->level_access);
+
+        // Simpan perubahan
+        $folder->save();
+
+        // Kembali ke halaman sebelumnya dengan pesan sukses
+        return redirect()->back()->with('success', 'Akses folder berhasil diperbarui.');
+    }
+
+    public function folder_destroy($id)
+    {
+        ActivityLog::create([
+            'action' => 'create',
+            'user_id' => Session::get('id'), // ID pengguna yang sedang login
+            'description' => 'User Menghapus Folder.',
+        ]);
+
+        // Cari data user berdasarkan ID
+        $folder = Folder::findOrFail($id);
+
+        // Hapus data user (soft delete)
+        $folder->delete();
+
+        // Redirect dengan pesan sukses
+        return redirect()->back()->with('success', 'Data user berhasil dihapus');
+    }
 }

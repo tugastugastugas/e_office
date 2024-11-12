@@ -15,6 +15,7 @@ class File extends Model
         'nama_file',
         'id_folder',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'file_path',
     ];
 }

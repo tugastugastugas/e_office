@@ -94,6 +94,8 @@ Route::get('surat_masuk', [SuratController::class, 'surat_masuk'])
     ->middleware('check.permission:surat')
     ->name('surat_masuk');
 Route::post('/kirim-surat/{id}', [SuratController::class, 'kirimSurat']);
+Route::get('/download-surat/{id_surat}', [SuratController::class, 'downloadSurat'])
+    ->name('download.surat');
 
 // ROUTE DOKUMEN
 Route::get('folder', [FolderController::class, 'folder'])
@@ -107,6 +109,9 @@ Route::get('/folder/lihat_folder/{id}', [FolderController::class, 'lihat_folder'
 Route::delete('/file/{id_file}', [FolderController::class, 'file_destroy'])->name('file.destroy');
 Route::post('/folder/{id_folder}/upload', [FolderController::class, 'store'])->name('file.store');
 Route::get('/file/download/{id_file}', [FolderController::class, 'download'])->name('file.download');
+Route::post('/update-access', [FolderController::class, 'updateAccess'])->name('update_access');
+Route::delete('/folder/{id_folder}', [FolderController::class, 'folder_destroy'])->name('folder.destroy');
+
 
 // ROUTE CUTI
 Route::get('cuti', [CutiController::class, 'cuti'])

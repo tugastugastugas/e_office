@@ -52,37 +52,59 @@ class SuratController extends BaseController
 
         try {
             $request->validate([
-                'nomor_surat' => 'required',
+                'nomor_surat' => 'required|unique:surat,nomor_surat',
                 'topik_surat' => 'required',
-                'isi_surat' => 'required',
+                'file_surat' => 'required|mimes:pdf,doc,docx|max:5120', // maks 5MB
                 'penerima' => 'required',
             ]);
 
             // Mendapatkan id_user dari session
             $id_user = Session::get('id');
 
-            // Simpan data ke tabel surat
-            $surat = new Surat();
-            $surat->nomor_surat = $request->input('nomor_surat');
-            $surat->topik_surat = $request->input('topik_surat');
-            $surat->isi_surat = $request->input('isi_surat');
-            $surat->penerima = $request->input('penerima');
-            $surat->id_user = $id_user; // Memasukkan id_user ke dalam model
+            // Proses upload file
+            if ($request->hasFile('file_surat')) {
+                $file = $request->file('file_surat');
+                $namaFile = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('uploads/surat', $namaFile, 'public');
 
+                // Simpan data ke tabel surat
+                $surat = new Surat();
+                $surat->nomor_surat = $request->input('nomor_surat');
+                $surat->topik_surat = $request->input('topik_surat');
+                $surat->isi_surat = $namaFile; // Simpan nama file
+                $surat->path_surat = $path; // Simpan path file
+                $surat->penerima = $request->input('penerima');
+                $surat->id_user = $id_user; // Memasukkan id_user ke dalam model
 
-            // Simpan ke database
-            $surat->save();
+                // Simpan ke database
+                $surat->save();
 
-            // Redirect ke halaman lain
-            return redirect()->route('surat')->with('success', 'Surat berhasil ditambahkan.');
+                // Log aktivitas berhasil
+                Log::info('Surat berhasil dibuat oleh user ID: ' . $id_user);
+
+                // Redirect ke halaman lain
+                return redirect()->route('surat')->with('success', 'Surat berhasil ditambahkan.');
+            } else {
+                throw new \Exception('File surat tidak ditemukan');
+            }
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Handle validation errors
+            Log::error('Validasi gagal: ' . $e->getMessage());
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
         } catch (\Exception $e) {
             // Log error detail
             Log::error('Gagal menyimpan surat: ' . $e->getMessage());
 
             // Redirect kembali dengan pesan kesalahan
-            return redirect()->back()->withErrors(['msg' => 'Gagal menambahkan surat. Silakan coba lagi.']);
+            return redirect()->back()
+                ->with('error', 'Gagal menambahkan surat. ' . $e->getMessage())
+                ->withInput();
         }
     }
+
+
 
     public function surat_keluar()
     {
@@ -100,9 +122,11 @@ class SuratController extends BaseController
             ->select(
                 'surat.id_surat',
                 'surat.nomor_surat',
+                'surat_keluar.id_surat_keluar',
                 'surat.topik_surat',
                 'surat.isi_surat',
                 'surat.penerima',
+                'surat.path_surat',
                 'surat.created_at',
             )
             ->where('user.id_user', $id_user)  // Mengambil data sesuai session id_user
@@ -130,11 +154,14 @@ class SuratController extends BaseController
             ->join('surat', 'surat_masuk.id_surat', '=', 'surat.id_surat')
             ->join('user', 'surat.id_user', '=', 'user.id_user')
             ->select(
+                'surat.id_surat',
+                'surat_masuk.id_surat_masuk',
                 'surat.nomor_surat',
                 'surat.topik_surat',
                 'surat.isi_surat',
                 'surat.penerima',
                 'surat.created_at',
+                'surat.path_surat',
                 'user.username',
                 'user.level'
             )
@@ -147,6 +174,49 @@ class SuratController extends BaseController
         echo view('menu');
         echo view('surat_masuk', compact('surat_masuk')); // Halaman untuk scan barcode
         echo view('footer');
+    }
+
+    public function downloadSurat($id_surat)
+    {
+        try {
+            // Cari surat berdasarkan ID
+            $surat = Surat::findOrFail($id_surat);
+
+            // Pastikan path surat ada
+            if (!$surat->path_surat) {
+                return redirect()->back()->with('error', 'File surat tidak ditemukan.');
+            }
+
+            // Path file lengkap
+            $filePath = storage_path('app/public/' . $surat->path_surat);
+
+            // Cek apakah file benar-benar ada
+            if (!file_exists($filePath)) {
+                return redirect()->back()->with('error', 'File tidak ditemukan di sistem.');
+            }
+
+            // Log aktivitas download
+            ActivityLog::create([
+                'action' => 'download',
+                'user_id' => Session::get('id'),
+                'description' => "Download surat dengan nomor: {$surat->nomor_surat}"
+            ]);
+
+            // Download file
+            return response()->download(
+                $filePath,
+                $surat->nomor_surat . '_' . basename($surat->path_surat),
+                [
+                    'Content-Type' => mime_content_type($filePath)
+                ]
+            );
+        } catch (\Exception $e) {
+            // Log error
+            Log::error('Gagal download surat: ' . $e->getMessage());
+
+            // Redirect dengan pesan error
+            return redirect()->back()->with('error', 'Gagal mendownload surat. ' . $e->getMessage());
+        }
     }
 
     public function kirimSurat($id)

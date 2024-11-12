@@ -15,6 +15,7 @@ class Surat extends Model
         'nomor_surat',
         'topik_surat',
         'isi_surat',
+        'path_surat',
         'id_user',
         'penerima',
         'created_at',

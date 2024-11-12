@@ -17,9 +17,16 @@
                 <input type="text" class="form-control" id="exampleInputText1" name="topik_surat" placeholder="">
             </div>
             <div class="form-group">
-                <label class="form-label" for="exampleFormControlTextarea1">Isi Surat</label>
-                <textarea class="form-control" name="isi_surat" id="exampleFormControlTextarea1" rows="8"
-                    placeholder="Tuliskan isi surat di sini. Gunakan paragraf dengan menekan Enter dua kali."></textarea>
+                <label class="form-label" for="fileSurat">Unggah File Surat</label>
+                <input
+                    type="file"
+                    class="form-control"
+                    id="fileSurat"
+                    name="file_surat"
+                    accept=".pdf,.doc,.docx">
+                <small class="form-text text-muted">
+                    Ukuran maksimal file: 5MB. Tipe file yang diizinkan: PDF, DOC, DOCX
+                </small>
             </div>
 
             <div class="form-group">

@@ -18,6 +18,7 @@
                                 <th>Isi Surat</th>
                                 <th>Penerima</th>
                                 <th>Tanggal Buat</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -30,6 +31,15 @@
                                 <td>{{ $sm->isi_surat }}</td>
                                 <td>{{ $sm->penerima }}</td>
                                 <td>{{ $sm->created_at }}</td>
+                                <td>
+
+                                    <a href="{{ route('download.surat', $sm->id_surat) }}"
+                                        class="btn btn-primary btn-sm"
+                                        title="Download Surat">
+                                        Download
+                                    </a>
+
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -42,6 +52,7 @@
                                 <th>Isi Surat</th>
                                 <th>Penerima</th>
                                 <th>Tanggal Buat</th>
+                                <th>Aksi</th>
                             </tr>
                         </tfoot>
                     </table>
